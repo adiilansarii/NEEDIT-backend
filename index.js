@@ -18,7 +18,7 @@ const PORT=process.env.PORT ||3010
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
-  origin: "https://needit-frontend.vercel.app", // your frontend URL
+  origin: "http://localhost:5173", // your frontend URL
   credentials: true // allow cookies
 }));
 app.use(express.static("public"));

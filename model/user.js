@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-const { generateToken } = require("../service/authentication");
 const bcrypt = require("bcryptjs");
+const { generateToken } = require("../service/authentication");
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -17,24 +17,22 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    branch: { type: String, default: "B-Tech" }, // New field
-    profileImage: { type: String, default: "/dp.jpeg" },
+    branch: { type: String, default: "B-Tech" }, // default field
+    profileImage: { type: String, default: "/dp.jpeg" }, // default profile image
   },
   { timestamps: true }
 );
 
-userSchema.statics.matchPasswordAndGenerateToken = async function (
-  email,
-  password
-) {
+// Custom static method for login
+userSchema.statics.matchPasswordAndGenerateToken = async function (email, password) {
   const user = await this.findOne({ email });
   if (!user) throw new Error("User not found");
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error("Password not matched");
+  if (!isMatch) throw new Error("Incorrect password");
 
-  const token = generateToken(user);
-  return token;
+  // Generate JWT for authenticated user
+  return generateToken(user);
 };
 
 module.exports = mongoose.model("User", userSchema);
