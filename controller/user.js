@@ -11,6 +11,7 @@ const addUser = async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
 
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await User.create({ fullName, email, password: hashedPassword });
