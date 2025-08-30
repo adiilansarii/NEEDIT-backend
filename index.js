@@ -2,7 +2,8 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
 
 const { checkForAuthenticationCookie } = require("./middleware/authenticate");
 const routerBlogs = require("./routes/Blogs");
@@ -22,7 +23,7 @@ app.use(express.static("public"));
 // Allow localhost frontend for testing with credentials
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // your local frontend
+    origin: process.env.FRONTEND_URL ||"https://needit-interview.vercel.app", // your local frontend
     credentials: true,               // allow cookies
   })
 );
