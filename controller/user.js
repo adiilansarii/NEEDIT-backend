@@ -1,29 +1,4 @@
-const User = require("../model/user");
-const bcrypt = require("bcryptjs");
-
-// Register a new user
-const addUser = async (req, res) => {
-  try {
-    const { fullName, email, password } = req.body;
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
-    }
-
-    // Hash password and create user
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ fullName, email, password: hashedPassword });
-
-    return res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.error("Signup Error:", error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-// Login user and set cookie
+// In your login controller (User.js)
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -32,11 +7,13 @@ const loginUser = async (req, res) => {
 
   try {
     const token = await User.matchPasswordAndGenerateToken(email, password);
+
+    // Cookies for deployed backend
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,      // use true if HTTPS
-        sameSite: "lax",
+        secure: true,       // HTTPS required for Render
+        sameSite: "None",   // allow cross-origin from localhost frontend
         path: "/",
       })
       .status(200)
@@ -46,15 +23,13 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Logout user and clear cookie
+// Logout
 const logoutUser = async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "None",
     path: "/",
   });
   res.json({ message: "Logged out successfully" });
 };
-
-module.exports = { addUser, loginUser, logoutUser };
