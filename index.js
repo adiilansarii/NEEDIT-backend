@@ -2,7 +2,6 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const path = require("path");
 require("dotenv").config();
 
 const { checkForAuthenticationCookie } = require("./middleware/authenticate");
@@ -20,11 +19,11 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 // ----------------- CORS SETUP -----------------
-// Allow localhost/frontend for testing with credentials
+// Allow localhost frontend for testing with credentials
 app.use(
   cors({
-    origin: "https://needit-interview.vercel.app", // your frontend
-    credentials: true, // allow cookies
+    origin:"https://needit-interview.vercel.app", // your frontend
+    credentials: true,               // allow cookies
   })
 );
 
@@ -32,8 +31,8 @@ app.use(
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // ----------------- AUTH MIDDLEWARE -----------------
 // Skip login/signup routes
@@ -52,16 +51,6 @@ app.get("/", checkForAuthenticationCookie("token"), (req, res) => {
   res.json({ user: req.user });
 });
 
-// ----------------- FRONTEND SERVE -----------------
-// Serve React build (client/dist folder after build)
-const distPath = path.join(__dirname, "client", "dist");
-app.use(express.static(distPath));
-
-// Catch-all route for React Router (fixes 404 on refresh)
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
-});
-
 // ----------------- ERROR HANDLER -----------------
 
 app.use((err, req, res, next) => {
@@ -71,4 +60,4 @@ app.use((err, req, res, next) => {
 
 // ----------------- START SERVER -----------------
 
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
