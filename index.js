@@ -18,6 +18,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
 
+const path = require("path");
+
+// Serve static files from frontend build
+app.use(express.static(path.join(__dirname, "client", "dist"))); // adjust if needed
+
+// Catch-all route to support React Router
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
+
 // ----------------- CORS SETUP -----------------
 // Allow localhost frontend for testing with credentials
 app.use(
