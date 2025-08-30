@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
         path: "/",
       })
       .status(200)
-      .json({ message: "Login successful" });
+       .json({ message: "Login successful", user: { _id: user._id, fullName: user.fullName } });
   } catch (err) {
     return res.status(401).json({ message: err.message });
   }
