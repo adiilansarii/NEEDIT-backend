@@ -22,7 +22,7 @@ app.use(express.static("public"));
 // Allow localhost frontend for testing with credentials
 app.use(
   cors({
-    origin: "https://needit-interview.vercel.app", // your local frontend
+    origin:process.env.FRONTEND_URL, // your local frontend
     credentials: true,               // allow cookies
   })
 );
