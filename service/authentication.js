@@ -1,22 +1,21 @@
-const jwt=require("jsonwebtoken"); 
-const secretKey="Adil(00)$23";
+const jwt = require("jsonwebtoken"); 
+require("dotenv").config(); // Load variables from .env
 
-function generateToken(user){
-    const payload={
-        _id:user._id,
-    email:user.email,
-    role:user.role
-    }
-    const token =jwt.sign(payload,secretKey);
-    return token;
+const secretKey = process.env.JWT_SECRET; // Secret key from .env
+
+// Generate JWT for a user
+function generateToken(user) {
+  const payload = {
+    _id: user._id,
+    email: user.email,
+    role: user.role,
+  };
+  return jwt.sign(payload, secretKey, { expiresIn: "1d" }); // optional expiration
 }
 
-function validateToken(token){
-    const payload=jwt.verify(token,secretKey);
-    return payload;
+// Validate JWT and return payload
+function validateToken(token) {
+  return jwt.verify(token, secretKey); // throws error if invalid
 }
 
-module.exports={
-    generateToken,
-    validateToken,
-}
+module.exports = { generateToken, validateToken };

@@ -1,5 +1,6 @@
 const AddBlog = require("../model/AddBlog");
 
+// Get all blogs
 async function getBlogs(req, res) {
   try {
     const blogs = await AddBlog.find().populate(
@@ -9,22 +10,30 @@ async function getBlogs(req, res) {
     return res.status(200).json(blogs);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ mess: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 }
-async function getBlogById(req, res) {
-  const blog = await AddBlog.findById(req.params.id).populate(
-    "user",
-    "fullName branch profileImage"
-  );
-  if (!blog) return res.status(404).json({ error: "Blog not found" });
 
-  return res.json(blog);
+// Get a single blog by ID
+async function getBlogById(req, res) {
+  try {
+    const blog = await AddBlog.findById(req.params.id).populate(
+      "user",
+      "fullName branch profileImage"
+    );
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    return res.json(blog);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
 }
 
+// Add a new blog
 async function addBlog(req, res) {
   const { title, company, category, content } = req.body;
-  const userId = req.user?._id; // make sure authenticate middleware sets req.user
+  const userId = req.user?._id; // from authentication middleware
 
   if (!title || !company || !category || !content)
     return res.status(400).json({ message: "All fields are required" });
@@ -37,7 +46,7 @@ async function addBlog(req, res) {
       company,
       category,
       content,
-      user: userId, // associate blog with logged-in user
+      user: userId,
     });
     return res.status(201).json(newBlog);
   } catch (error) {
@@ -46,31 +55,35 @@ async function addBlog(req, res) {
   }
 }
 
-
+// Edit a blog
 async function editBlog(req, res) {
-  const { title, company, category, content } = req.body;
-  const blog = await AddBlog.findById(req.params.id);
   try {
-    if (blog) {
-      await AddBlog.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.json({ title, company, category, content });
-    }
-  } catch (error) {
-    return res.status(404).json({ mess: "can not find recipe" });
-  }
-}
-async function deleteBlog(req, res) {
-  try {
-    const Blog = await AddBlog.findByIdAndDelete(req.params.id);
+    const blog = await AddBlog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
 
-    if (!Blog) {
-      return res.status(404).json({ mess: "Blog not found" });
-    }
+    const updatedBlog = await AddBlog.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
 
-    return res.status(200).json({ mess: "Blog deleted successfully", Blog });
+    return res.json(updatedBlog);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ mess: "Server error" });
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Delete a blog
+async function deleteBlog(req, res) {
+  try {
+    const blog = await AddBlog.findByIdAndDelete(req.params.id);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    return res.status(200).json({ message: "Blog deleted successfully", blog });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
   }
 }
 
