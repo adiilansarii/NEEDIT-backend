@@ -20,13 +20,14 @@ app.use(express.static("public"));
 
 const path = require("path");
 
-// Serve static files from frontend build
-app.use(express.static(path.join(__dirname, "client", "dist"))); // adjust if needed
+// Serve static files first
+app.use(express.static(path.join(__dirname, "client", "dist")));
 
-// Catch-all route to support React Router
+// Fallback route — must come *after* API routes
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
+
 
 // ----------------- CORS SETUP -----------------
 // Allow localhost frontend for testing with credentials
