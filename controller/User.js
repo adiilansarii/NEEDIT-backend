@@ -44,7 +44,7 @@ const loginUser = async (req, res) => {
       .status(200)
        .json({ message: "Login successful" });
   } catch (err) {
-    return res.status(401).json({ message: "yahi se aa rha hai error" });
+    return res.status(401).json({ message: "user not found" });
   }
 };
 
