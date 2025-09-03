@@ -29,6 +29,16 @@ app.use(
 
 // ----------------- DATABASE -----------------
 
+app.get("/health", async (req, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.status(200).send("MongoDB alive");
+  } catch (err) {
+    res.status(500).send("MongoDB error");
+  }
+});
+
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
