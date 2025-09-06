@@ -10,7 +10,7 @@ function generateToken(user) {
     email: user.email,
     role: user.role,
   };
-  return jwt.sign(payload, secretKey, { expiresIn: "1d" }); // optional expiration
+  return jwt.sign(payload, secretKey, { expiresIn: "1d" });
 }
 
 // Validate JWT and return payload

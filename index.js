@@ -11,47 +11,32 @@ const routerUser = require("./routes/User");
 const app = express();
 const PORT = process.env.PORT || 3010;
 
-// ----------------- MIDDLEWARE -----------------
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static("public"));
 
-// ----------------- CORS SETUP -----------------
+
 // Allow localhost frontend for testing with credentials
 app.use(
   cors({
-    origin:"https://needit-interview.vercel.app", // your frontend
+    origin:"https://needit-interview.vercel.app", // your frontend link
     credentials: true,               // allow cookies
   })
 );
-
-// ----------------- DATABASE -----------------
-
-app.get("/health", async (req, res) => {
-  try {
-    await mongoose.connection.db.admin().ping();
-    res.status(200).send("MongoDB alive");
-  } catch (err) {
-    res.status(500).send("MongoDB error");
-  }
-});
-
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// ----------------- AUTH MIDDLEWARE -----------------
-// Skip login/signup routes
+// middleware to Skip auth for login/signup routes
 app.use((req, res, next) => {
   if (req.path === "/login" || req.path === "/signup") return next();
   checkForAuthenticationCookie("token")(req, res, next);
 });
 
-// ----------------- ROUTES -----------------
 
 app.use("/", routerUser);
 app.use("/blogs", routerBlogs);
@@ -61,13 +46,12 @@ app.get("/", checkForAuthenticationCookie("token"), (req, res) => {
   res.json({ user: req.user });
 });
 
-// ----------------- ERROR HANDLER -----------------
+
 
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// ----------------- START SERVER -----------------
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
