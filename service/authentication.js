@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken"); 
+const jwt = require("jsonwebtoken");
 require("dotenv").config(); // Load variables from .env
 
 const secretKey = process.env.JWT_SECRET; // Secret key from .env

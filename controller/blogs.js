@@ -22,7 +22,6 @@ async function getBlogById(req, res) {
       "fullName branch profileImage"
     );
     if (!blog) return res.status(404).json({ message: "Blog not found" });
-
     return res.json(blog);
   } catch (error) {
     console.error(error);
@@ -55,18 +54,19 @@ async function addBlog(req, res) {
   }
 }
 
-// Edit a blog
+// Edit a blog (only owner can edit)
 async function editBlog(req, res) {
   try {
     const blog = await AddBlog.findById(req.params.id);
     if (!blog) return res.status(404).json({ message: "Blog not found" });
-
+    if (!req.user || blog.user.toString() !== req.user._id) {
+      return res.status(403).json({ message: "Not authorized to edit this blog" });
+    }
     const updatedBlog = await AddBlog.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-
     return res.json(updatedBlog);
   } catch (error) {
     console.error(error);
@@ -74,12 +74,15 @@ async function editBlog(req, res) {
   }
 }
 
-// Delete a blog
+// Delete a blog (only owner can delete)
 async function deleteBlog(req, res) {
   try {
-    const blog = await AddBlog.findByIdAndDelete(req.params.id);
+    const blog = await AddBlog.findById(req.params.id);
     if (!blog) return res.status(404).json({ message: "Blog not found" });
-
+    if (!req.user || blog.user.toString() !== req.user._id) {
+      return res.status(403).json({ message: "Not authorized to delete this blog" });
+    }
+    await AddBlog.findByIdAndDelete(req.params.id);
     return res.status(200).json({ message: "Blog deleted successfully", blog });
   } catch (error) {
     console.error(error);
